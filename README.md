@@ -1,10 +1,14 @@
 # github-websocket-api
 
-Github has an undocumented websocket API hosted on `alive.github.com`.
+Github has an undocumented websocket API hosted on `alive.github.com` for some realtime interactions.
 
 ### Events
 
-Update on workflow runs
+- Workflow Run
+- Notication Changed
+- Check Suites
+
+### Payloads/Events
 
 `ack` packet
 
