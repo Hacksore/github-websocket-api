@@ -77,32 +77,6 @@ Completed
 }
 ```
 
-### Demo code hack
+### Example
 
-```js
-// this comes from the document in a <link /> tag
-const session = "";
-
-// this is your user id on github
-const userId = "123";
-
-const ws = new WebSocket(
-  `wss://alive.github.com/_sockets/u/${userId}/ws?session=${session}`
-);
-
-ws.onopen = function () {
-  // handshake packet
-  ws.send(
-    JSON.stringify({
-      subscribe: {
-        [session]: "",
-      },
-    })
-  );
-};
-
-// listen for all messages
-ws.onmessage = function (data) {
-  console.log(data);
-};
-```
+See demo in `client.ts`
