@@ -1,0 +1,21 @@
+{
+  "name": "github-websocket-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "repository": "git@github.com:Hacksore/github-websocket-api.git",
+  "author": "Sean Boult <996134+Hacksore@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "ts-node": "^10.9.1",
+    "ws": "^8.10.0"
+  },
+  "scripts": {
+    "start": "ts-node --esm client.ts"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.3",
+    "typescript": "^4.8.4"
+  }
+}
