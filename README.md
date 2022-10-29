@@ -45,9 +45,25 @@ Update on workflow runs
 }
 ```
 
+`workflow_run`
+
+```json
+{
+  "e": "msg",
+  "ch": "workflow_run:3351967683:execution",
+  "off": "1667059757243-0",
+  "data": {
+    "timestamp": "2022-10-29T16:09:15.000Z",
+    "wait": 372.463,
+    "reason": "Execution created"
+  }
+}
+```
+
 `check_suites` packet
 
 In progress
+
 ```json
 {
   "e": "msg",
@@ -63,6 +79,7 @@ In progress
 ```
 
 Completed
+
 ```json
 {
   "e": "msg",
