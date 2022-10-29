@@ -8,6 +8,19 @@ Github has an undocumented websocket API hosted on `alive.github.com` for some r
 - Notication Changed
 - Check Suites
 
+### Auth
+
+You can view page source on github to find your session id in a `<link/>` tag.
+
+ex:
+```html
+<link
+  rel="shared-web-socket"
+  href="wss://alive.github.com/_sockets/u/<userId>/ws?session=<sessionId>"
+  data-refresh-url="/_alive"
+/>
+```
+
 ### Payloads/Events
 
 `ack` packet
