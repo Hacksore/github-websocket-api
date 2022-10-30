@@ -2,6 +2,10 @@
 
 Github has an undocumented websocket API hosted on `alive.github.com` for some realtime interactions.
 
+# 🛑 Currrent Blocker
+
+I still can't get data other than the `ack` payload to come back. So either I'm missing a step or GitHub is doing some magic validation 🧙.
+
 ### Events
 
 - Workflow Run
