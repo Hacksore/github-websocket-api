@@ -27,7 +27,7 @@ ex:
 
 ### How to run
 1. Create an `.env` file, copy the example. Source both your user id and a session id.
-1. run `yarn` to install the deps`
+1. run `yarn` to install the deps
 1. run `yarn start` to start the client
 
 
