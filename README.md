@@ -9,7 +9,7 @@ I still can't get data other than the `ack` payload to come back. So either I'm 
 ### Events
 
 - Workflow Run
-- Notication Changed
+- Notification Changed
 - Check Suites
 
 ### Auth
@@ -25,9 +25,17 @@ ex:
 />
 ```
 
-### Payloads/Events
+### How to run
+1. Create an `.env` file, copy the example. Source both your user id and a session id.
+1. run `yarn` to install the deps`
+1. run `yarn start` to start the client
 
-`ack` packet
+
+# Payloads/Events
+I've attempted to give a good description to each of these payloads below.
+
+## ack
+This is seems to be returned not matter what you send to the API.
 
 ```json
 {
@@ -37,7 +45,9 @@ ex:
 }
 ```
 
-`subscribe` packet
+## subscribe
+This is what the client will do when you visit a github page. It looks to be asking github 
+> please give me events for `<sessionId>`
 
 ```json
 {
@@ -47,7 +57,9 @@ ex:
 }
 ```
 
-`unsubscribe` packet
+## unsubscribe
+This is what the client will do when you navigating to a new page on github. It looks to be tell github saying
+> please unsubscribe me for all previous `<sessionId>` event subscriptions
 
 ```json
 {
@@ -55,7 +67,8 @@ ex:
 }
 ```
 
-`notification-changed` packet
+## notification-changed
+This is called whenever the indicator needs to update. Anything that will leave items in your notifications inbox will trigger this.
 
 ```json
 {
@@ -66,12 +79,13 @@ ex:
 }
 ```
 
-`workflow_run`
+## workflow_run
+This is called whenever a workflow run starts.
 
 ```json
 {
   "e": "msg",
-  "ch": "workflow_run:3351967683:execution",
+  "ch": "workflow_run:<runId>:execution",
   "off": "1667059757243-0",
   "data": {
     "timestamp": "2022-10-29T16:09:15.000Z",
@@ -80,10 +94,8 @@ ex:
   }
 }
 ```
-
-`check_suites` packet
-
-In progress
+## check_suites
+This is called whenever a workflow job updates and has two states in the `reason` field. It can either be `in_progress` or `completed`.
 
 ```json
 {
@@ -93,23 +105,7 @@ In progress
   "data": {
     "timestamp": "2022-10-29T15:15:04.000Z",
     "wait": 396.523,
-    "reason": "check_suite #<jobId> updated: in_progress",
-    "log_archive": false
-  }
-}
-```
-
-Completed
-
-```json
-{
-  "e": "msg",
-  "ch": "check_suites:<jobId>",
-  "off": "1667056504426-0",
-  "data": {
-    "timestamp": "2022-10-29T15:15:04.000Z",
-    "wait": 396.523,
-    "reason": "check_suite #<jobId> updated: completed",
+    "reason": "check_suite #<jobId> updated: <state>",
     "log_archive": false
   }
 }
