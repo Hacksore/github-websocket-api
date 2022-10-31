@@ -73,7 +73,7 @@ This is seems to be returned not matter what you send to the API.
 
 ## subscribe
 
-This is what the client will do when you visit a github page. It looks to be asking github
+This is what the client will send when you visit a github page. It looks to be asking github
 
 > please give me events for `<sessionId>`
 
@@ -87,7 +87,7 @@ This is what the client will do when you visit a github page. It looks to be ask
 
 ## unsubscribe
 
-This is what the client will do when you navigating to a new page on github. It looks to be tell github saying
+This is what the client will send when you navigating to a new page on github. It looks to be tell github saying
 
 > please unsubscribe me for all previous `<sessionId>` event subscriptions
 
@@ -99,7 +99,7 @@ This is what the client will do when you navigating to a new page on github. It 
 
 ## notification-changed
 
-This is called whenever the indicator needs to update. Anything that will leave items in your notifications inbox will trigger this.
+This is emitted whenever the indicator needs to update. Anything that will leave items in your notifications inbox will trigger this.
 
 ```json
 {
@@ -112,7 +112,7 @@ This is called whenever the indicator needs to update. Anything that will leave 
 
 ## workflow_run
 
-This is called whenever a workflow run starts.
+This is emitted whenever a workflow run starts.
 
 ```json
 {
@@ -129,7 +129,7 @@ This is called whenever a workflow run starts.
 
 ## check_suites
 
-This is called whenever a workflow job updates and has two states in the `reason` field. It can either be `in_progress` or `completed`.
+This is emitted whenever a workflow job updates and has two states in the `reason` field. It can either be `in_progress` or `completed`.
 
 ```json
 {
