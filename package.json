@@ -8,6 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.0.3",
+    "got": "^12.5.2",
     "ts-node": "^10.9.1",
     "ws": "^8.10.0"
   },

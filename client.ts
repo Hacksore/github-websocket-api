@@ -1,51 +1,57 @@
 import WebSocket from "ws";
+
 import "dotenv/config";
+import {
+  decodeSession,
+  generatePresenceId,
+  getWebsocketSessionId,
+  sendPacket,
+  subscribe,
+} from "./util.js";
 
-const { USER_ID, SESSION_ID } = process.env;
+const { USER_ID, USER_SESSION } = process.env;
 
-if (!SESSION_ID) throw new Error("SESSION_ID must be set");
+if (!USER_SESSION) throw new Error("USER_SESSION must be set");
 if (!USER_ID) throw new Error("USER_ID must be set");
 
-const ws = new WebSocket(
-  `wss://alive.github.com/_sockets/u/${USER_ID}/ws?session=${SESSION_ID}`,
-  {
-    host: "alive.github.com",
-    origin: "https://github.com",
-    headers: {
-      "Cookie:": "_octo=GH1.1.494326951.1666844443; preferred_color_mode=dark; tz=America%2FChicago; color_mode=%7B%22color_mode%22%3A%22dark%22%2C%22light_theme%22%3A%7B%22name%22%3A%22light%22%2C%22color_mode%22%3A%22light%22%7D%2C%22dark_theme%22%3A%7B%22name%22%3A%22dark%22%2C%22color_mode%22%3A%22dark%22%7D%7D; logged_in=yes; dotcom_user=Hacksore",
-      "Sec-WebSocket-Key": "ligma",
-      "Sec-WebSocket-Version": 13,
-      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15",
-    },
-  }
-);
+const sessionId = await getWebsocketSessionId();
+if (!sessionId) {
+  throw new Error("Could not find a sessionId from github");
+}
 
-const sendPacket = (ws: WebSocket, packet: any) => {
-  ws.send(JSON.stringify(packet));
-};
+const [event, idkYet] = decodeSession(sessionId);
 
-const subscribe = (ws: WebSocket, sessionId: string) => {
-  console.log("Subscribing to:", sessionId);
-  sendPacket(ws, {
-    subscribe: {
-      [sessionId]: "",
-    },
-  });
-};
+console.log("initial event", event);
+console.log("idk what this is yet", idkYet);
 
-const unsubscribe = (ws: WebSocket, sessionId: string) => {
-  console.log("Unsubscribing to:", sessionId);
-  sendPacket(ws, {
-    unsubscribe: [sessionId],
-  });
-};
+const socketUrl = `wss://alive.github.com/_sockets/u/${USER_ID}/ws?session=${sessionId}&shared=false&p=${generatePresenceId()}.0`;
+
+const ws = new WebSocket(socketUrl, {
+  host: "alive.github.com",
+  origin: "https://github.com",
+  headers: {
+    "User-Agent":
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15",
+  },
+});
 
 ws.on("open", () => {
-  console.log("Socket opened");  
-  subscribe(ws, SESSION_ID);
-  // sendPacket(ws, {test: 1});
-  
-  // Figure out what other packets we can send
+  console.log("Socket opened");
+
+  const subPayload = {
+    c: `notification-changed:${USER_ID}`,
+    t: Math.floor(Date.now() / 1000),
+  };
+  const subPayloadBase64 = Buffer.from(JSON.stringify(subPayload)).toString(
+    "base64"
+  );
+
+  console.log(subPayload, subPayloadBase64);
+  sendPacket(ws, {
+    subscribe: {
+      [`${subPayloadBase64}--<idk what this is>`]: "",
+    },
+  });
 });
 
 // print out all messages
