@@ -22,7 +22,13 @@ Schema:
 This is what the github webpage has as the first part `session` field in the websocket query string.
 
 ```json
-{ v: "V3", u: <userId>, s: <number>, c: <number>, t: <number> }
+{
+  "v": "V3",
+  "u": "<userId>",
+  "s": "<number>",
+  "c": "<number>",
+  "t": "<number>"
+}
 ```
 
 another piece of intel is how you subscribe to events, this is the decoded part of what the client will send as the first part.
