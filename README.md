@@ -1,4 +1,4 @@
-# github-websocket-api
+# github-websocket-pipelines-api
 
 Github has an undocumented websocket API hosted on `alive.github.com` for some realtime interactions.
 
@@ -148,3 +148,7 @@ This is emitted whenever a workflow job updates and has two states in the `reaso
 ### Example
 
 See demo in `client.ts`
+
+### Investigating 
+
+- How do I get a `jobId` that is used

@@ -9,49 +9,98 @@ import {
   subscribe,
 } from "./util.js";
 
-const { USER_ID, USER_SESSION } = process.env;
+import got from "got";
 
-if (!USER_SESSION) throw new Error("USER_SESSION must be set");
-if (!USER_ID) throw new Error("USER_ID must be set");
+const { USER_SESSION } = process.env;
 
-const sessionId = await getWebsocketSessionId();
-if (!sessionId) {
-  throw new Error("Could not find a sessionId from github");
-}
+if (!USER_SESSION) throw new Error("you need a USER_SESSION");
 
-const [event, idkYet] = decodeSession(sessionId);
+// check the status of a commit via a hash and get state if CI
+// https://api.github.com/repos/hacksore/test/commits/d8a3b73ad5b6a643bd218d482b296182d8622ae8/status
 
-console.log("initial event", event);
-console.log("idk what this is yet", idkYet);
 
-const socketUrl = `wss://alive.github.com/_sockets/u/${USER_ID}/ws?session=${sessionId}&shared=false&p=${generatePresenceId()}.0`;
+const jobParams = {
+  commitHash: "d8a3b73ad5b6a643bd218d482b296182d8622ae8",
+  // TODO: how do programmatically get this
+  jobId: "9237147042",
+};
+
+// const getRunningJobs 
+
+const getSocketUrl = async ({
+  commitHash,
+  jobId,
+}: {
+  commitHash: string;
+  jobId: string;
+}) => {
+  let liveLogs: any;
+
+  try {
+    liveLogs = await got(
+      `https://github.com/Hacksore/test/commit/${commitHash}/checks/${jobId}/live_logs`,
+      {
+        headers: {
+          accept: "application/json",
+          cookie: `user_session=${USER_SESSION}`,
+        },
+      }
+    ).json();
+  } catch (err: any) {
+    console.log(err.message);
+    throw new Error("could not get the live_logs response");
+  }
+
+  try {
+    const url = liveLogs.data.authenticated_url;
+
+    const res2 = await got(url, {
+      headers: {
+        accept: "application/json",
+      },
+    });
+
+    if (res2.statusCode !== 200) {
+      throw new Error("could not get the authenticated_url response");
+    }
+
+    const body = JSON.parse(res2.body);
+
+    return body.logStreamWebSocketUrl;
+  } catch (err) {
+    console.log(err);
+    throw new Error("Error getting authenticated_url");
+  }
+};
+
+const socketUrl = await getSocketUrl(jobParams);
+const rawParams = socketUrl.split("?")[1];
+const params = new URLSearchParams(rawParams);
+const runId = Number(params.get("runId"));
+const tenantId = params.get("tenantId");
 
 const ws = new WebSocket(socketUrl, {
-  host: "alive.github.com",
-  origin: "https://github.com",
   headers: {
-    "User-Agent":
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15",
+    Host: "pipelines.actions.githubusercontent.com",
+    Origin: "https://github.com",
   },
 });
 
+const sendPacket = (ws: WebSocket, packet: any) => {
+  // there is some strange termination string required
+  const payload = JSON.stringify(packet) + "\x1e";
+  ws.send(payload);
+};
+
 ws.on("open", () => {
   console.log("Socket opened");
-
-  const subPayload = {
-    c: `notification-changed:${USER_ID}`,
-    t: Math.floor(Date.now() / 1000),
-  };
-  const subPayloadBase64 = Buffer.from(JSON.stringify(subPayload)).toString(
-    "base64"
-  );
-
-  console.log(subPayload, subPayloadBase64);
+  sendPacket(ws, { protocol: "json", version: 1 });
   sendPacket(ws, {
-    subscribe: {
-      [`${subPayloadBase64}--<idk what this is>`]: "",
-    },
+    arguments: [tenantId, runId],
+    target: "WatchRunAsync",
+    type: 1,
   });
+  // Figure out what other packets we can send
 });
 
 // print out all messages
