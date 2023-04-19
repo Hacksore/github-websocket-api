@@ -1,4 +1,6 @@
 import WebSocket from "ws";
+import { parse } from "node-html-parser";
+import got from "got";
 
 import "dotenv/config";
 import {
@@ -7,6 +9,7 @@ import {
   getWebsocketSessionId,
   sendPacket,
   subscribe,
+  unsubscribe,
 } from "./util.js";
 
 import got from "got";
@@ -15,9 +18,32 @@ const { USER_SESSION } = process.env;
 
 if (!USER_SESSION) throw new Error("you need a USER_SESSION");
 
-// check the status of a commit via a hash and get state if CI
-// https://api.github.com/repos/hacksore/test/commits/d8a3b73ad5b6a643bd218d482b296182d8622ae8/status
+// get dom
+const body = await got("https://github.com/Hacksore/Hacksore/actions", {
+  headers: {
+    Cookie: `user_session=${USER_SESSION}`,
+  },
+}).text();
 
+const html = parse(body);
+
+// get all teh things in the DOM to sub to
+const elements = html.querySelectorAll(".js-socket-channel[data-channel]");
+
+const subscriptions = elements.map((item) => ({
+  id: item.attrs["data-channel"],
+  description: item.attrs["data-tooltip-global"],
+  url: item.attrs["data-url"],
+  job: item.id
+}))
+// .filter(item => !item.job.includes("check_suite"));
+
+// console.log(subscriptions)
+
+const [event, idkYet] = decodeSession(sessionId);
+
+// console.log("initial event", event);
+// console.log("idk what this is yet", idkYet);
 
 const jobParams = {
   commitHash: "d8a3b73ad5b6a643bd218d482b296182d8622ae8",

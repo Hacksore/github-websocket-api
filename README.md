@@ -14,10 +14,10 @@ Able to get data if I reuse the payload that is sent from a real client to subsc
 
 ### New intel
 
-It seems the `session` is in two parts, one a base64 encoded string with the payload seen below. I've yet to figure out what the second part of the payload is yet.
+It seems the `session` is in two parts, one a base64 encoded string with the payload seen below.
 
 Schema:
-`<base64String>--<someOtherString>`
+`<base64String>--<sessionIdentifierFromDOM>`
 
 This is what the github webpage has as the first part `session` field in the websocket query string.
 
